@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0b12">
+<title>WHAT IF? — 2 Player Challenge</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#080910;--card:#11131d;--card2:#181b28;--text:#f7f7fb;--muted:#a6a8b8;--accent:#8b5cf6;--accent2:#ec4899;--good:#22c55e;--danger:#ef4444}
+body{margin:0;background:radial-gradient(circle at 50% -10%,#25203f 0,#080910 42%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button,input,select{font:inherit}
+.app{max-width:760px;margin:auto;min-height:100vh;padding:18px 16px 30px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.logo{font-size:22px;font-weight:900;letter-spacing:-.7px}.logo span{color:#a78bfa}
+.iconbtn{border:0;background:#171925;color:white;border-radius:13px;width:43px;height:43px;font-size:20px}
+.screen{display:none}.screen.active{display:block}
+.hero{text-align:center;padding:35px 10px 25px}
+.hero h1{font-size:48px;line-height:1;margin:0 0 12px;font-weight:950;letter-spacing:-2px}
+.hero h1 span{background:linear-gradient(90deg,#a78bfa,#f472b6);-webkit-background-clip:text;color:transparent}
+.hero p{color:var(--muted);line-height:1.5;margin:0 auto;max-width:480px}
+.card{background:linear-gradient(145deg,rgba(25,27,40,.96),rgba(13,15,24,.96));border:1px solid #292c3b;border-radius:24px;padding:20px;box-shadow:0 18px 50px #0007;margin:14px 0}
+label{display:block;color:#b7b9c8;font-size:13px;font-weight:700;margin:0 0 7px}
+input,select{width:100%;background:#0c0e16;border:1px solid #303344;color:white;border-radius:14px;padding:14px;outline:none}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{width:100%;border:0;border-radius:16px;padding:15px 18px;font-weight:900;color:white;background:linear-gradient(135deg,#7c3aed,#db2777);box-shadow:0 10px 25px #7c3aed35;cursor:pointer}
+.btn:active{transform:scale(.98)}
+.btn.secondary{background:#1b1e2b;box-shadow:none;border:1px solid #303344}
+.btn.small{width:auto;padding:11px 15px}
+.actions{display:grid;gap:10px;margin-top:15px}
+.mode{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.mode button{padding:14px;border-radius:15px;border:1px solid #303344;background:#0d0f17;color:#aaa;cursor:pointer}
+.mode button.selected{border-color:#9b72ff;background:#241b3d;color:white}
+.challenge{text-align:center;padding:10px 0}
+.badge{display:inline-block;padding:7px 11px;border-radius:999px;background:#251d3d;color:#c4b5fd;font-size:12px;font-weight:800;margin-bottom:14px}
+.challenge h2{font-size:29px;line-height:1.18;margin:5px 0 20px}
+.timer{font-size:58px;font-weight:950;letter-spacing:-2px;margin:8px 0}
+.timer.warning{color:#f59e0b}.timer.danger{color:#ef4444}
+.progress{height:8px;background:#292c39;border-radius:20px;overflow:hidden;margin:15px 0}.bar{height:100%;background:linear-gradient(90deg,#8b5cf6,#ec4899);width:100%}
+.scorebox{display:flex;gap:10px;margin-bottom:15px}.score{flex:1;background:#171925;border:1px solid #292c3b;border-radius:17px;padding:13px;text-align:center}.score b{display:block;font-size:24px}.score small{color:#a6a8b8}
+.vote{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}.vote button{border:1px solid #343747;background:#11131d;color:white;border-radius:15px;padding:15px;font-weight:800}
+.results{text-align:center}.winner{font-size:52px;margin:8px}.results h2{margin:5px 0 8px;font-size:30px}
+.list{display:grid;gap:8px;margin-top:15px}.item{display:flex;justify-content:space-between;padding:12px 14px;background:#151722;border-radius:13px;color:#ddd}
+.muted{color:var(--muted);font-size:13px}.hidden{display:none!important}
+.toast{position:fixed;left:50%;bottom:25px;transform:translateX(-50%) translateY(20px);background:#fff;color:#111;padding:12px 18px;border-radius:13px;font-weight:800;opacity:0;pointer-events:none;transition:.25s;z-index:9}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(max-width:520px){.hero h1{font-size:42px}.row{grid-template-columns:1fr}.challenge h2{font-size:25px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="logo">WHAT <span>IF?</span></div>
+  <button class="iconbtn" id="soundBtn" aria-label="Sound">🔊</button>
+</header>
+
+<section id="home" class="screen active">
+  <div class="hero">
+    <h1>WHAT <span>IF?</span></h1>
+    <p>Ikki kishi uchun tezkor challenge o‘yini. Vazifani bajaring, ball oling va kim kuchliroq ekanini ko‘ring.</p>
+  </div>
+  <div class="card">
+    <div class="row">
+      <div><label>1-O‘YINCHI</label><input id="p1" maxlength="16" value="Player 1"></div>
+      <div><label>2-O‘YINCHI</label><input id="p2" maxlength="16" value="Player 2"></div>
+    </div>
+    <label style="margin-top:15px">Qiyinchilik</label>
+    <div class="mode">
+      <button class="selected" data-diff="easy">EASY</button>
+      <button data-diff="hard">HARD</button>
+    </div>
+    <label style="margin-top:15px">Vaqt</label>
+    <select id="time">
+      <option value="15">15 soniya</option>
+      <option value="30" selected>30 soniya</option>
+      <option value="45">45 soniya</option>
+      <option value="60">60 soniya</option>
+    </select>
+    <div class="actions">
+      <button class="btn" id="start">🚀 O‘YINNI BOSHLASH</button>
+      <button class="btn secondary" id="how">❓ Qanday o‘ynaladi?</button>
+    </div>
+  </div>
+  <div class="card">
+    <b>🔥 Qanday ishlaydi?</b>
+    <p class="muted">Navbat bilan challenge chiqadi. Bajarilgan bo‘lsa “BAJARDIM”ni bosing. Ikkinchi o‘yinchi tasdiqlashi mumkin. Har round ball beradi.</p>
+  </div>
+</section>
+
+<section id="game" class="screen">
+  <div class="scorebox">
+    <div class="score"><small id="n1">Player 1</small><b id="s1">0</b></div>
+    <div class="score"><small id="round">ROUND 1/10</small><b>⚡</b></div>
+    <div class="score"><small id="n2">Player 2</small><b id="s2">0</b></div>
+  </div>
+  <div class="card challenge">
+    <div class="badge" id="turn">PLAYER 1 NAVBATI</div>
+    <div class="timer" id="timer">30</div>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <h2 id="task">Challenge yuklanmoqda...</h2>
+    <p class="muted" id="category">RANDOM</p>
+    <div class="actions">
+      <button class="btn" id="done">✅ BAJARDIM</button>
+      <button class="btn secondary" id="skip">⏭️ O‘TKAZIB YUBORISH</button>
+    </div>
+  </div>
+</section>
+
+<section id="result" class="screen">
+  <div class="card results">
+    <div class="winner">🏆</div>
+    <h2 id="resultTitle">O‘yin tugadi!</h2>
+    <p class="muted" id="resultSub"></p>
+    <div class="scorebox">
+      <div class="score"><small id="rn1">Player 1</small><b id="rs1">0</b></div>
+      <div class="score"><small id="rn2">Player 2</small><b id="rs2">0</b></div>
+    </div>
+    <div class="list" id="history"></div>
+    <div class="actions">
+      <button class="btn" id="again">🔄 QAYTA O‘YNASH</button>
+      <button class="btn secondary" id="homeBtn">🏠 BOSH SAHIFA</button>
+    </div>
+  </div>
+</section>
+</div>
+<div class="toast" id="toast"></div>
+<div id="infoModal" class="hidden" style="position:fixed;inset:0;background:#0009;z-index:20;display:flex;align-items:center;justify-content:center;padding:18px">
+  <div class="card" style="max-width:520px;width:100%;margin:0;position:relative">
+    <button id="closeInfo" class="iconbtn" style="position:absolute;right:14px;top:14px">✕</button>
+    <h2 style="margin:0 45px 12px 0">🎮 O‘yin qanday o‘ynaladi?</h2>
+    <p class="muted" style="line-height:1.6">
+      1️⃣ Ikki o‘yinchi ismini kiriting.<br>
+      2️⃣ <b style="color:white">O‘YINNI BOSHLASH</b> tugmasini bosing.<br>
+      3️⃣ Har roundda navbatdagi playerga challenge chiqadi.<br>
+      4️⃣ Vazifani bajarsangiz <b style="color:white">BAJARDIM</b>ni bosing — qolgan vaqtga qarab 1–3 ball olasiz.<br>
+      5️⃣ Bajarmoqchi bo‘lmasangiz <b style="color:white">O‘TKAZIB YUBORISH</b>ni bosing.<br>
+      6️⃣ 10 rounddan keyin umumiy natija chiqadi. 🏆
+    </p>
+    <button class="btn" id="closeInfo2">TUSHUNDIM</button>
+  </div>
+</div>
+
+<script>
+(() => {
+"use strict";
+
+const challenges = [
+ {c:"😂 FUN",e:"30 soniya ichida eng g‘alati yuz ifodasini qil."},
+ {c:"🧠 BRAIN",e:"10 soniyada 5 ta davlat nomini ayt."},
+ {c:"🎨 CREATIVE",e:"20 soniyada biror hayvonni qog‘ozga chiz. Ikkinchi o‘yinchi topishi kerak."},
+ {c:"👀 MEMORY",e:"Atrofingdagi 5 ta narsani ko‘r. Ko‘zingni yumib ularni sanab ber."},
+ {c:"🗣️ TALK",e:"10 soniya davomida “A” harfini ishlatmasdan gapir."},
+ {c:"⚡ SPEED",e:"10 soniyada 5 marta o‘tirib-tur."},
+ {c:"🤔 WHAT IF",e:"Agar bir kunga ko‘rinmas bo‘lib qolsang, birinchi nima qilarding? 15 soniyada javob ber."},
+ {c:"🎭 ACT",e:"Mashhur film qahramonini gapirmasdan taqlid qil."},
+ {c:"🔤 WORD",e:"“M” harfi bilan boshlanadigan 7 ta so‘z ayt."},
+ {c:"👂 SOUND",e:"Biror hayvon ovoziga taqlid qil. Ikkinchi o‘yinchi topadi."},
+ {c:"✋ CONTROL",e:"10 soniya chap qo‘ling bilan o‘ng qo‘lingga tegmasdan burninga tegin."},
+ {c:"🤣 FUN",e:"Ikkinchi o‘yinchini kuldirishga harakat qil. Qo‘l tekkizish mumkin emas."},
+ {c:"🧩 LOGIC",e:"1, 1, 2, 3, 5, ? — keyingi sonni ayt."},
+ {c:"📱 SPEED",e:"Telefoningdagi biror ilovani ochib, darhol yop. Kim tezroq?"}
+];
+
+const hard = [
+ {c:"🔥 HARD",e:"20 soniyada 10 ta davlat nomini ayt."},
+ {c:"🧠 HARD",e:"Ha va yo‘q so‘zlarini ishlatmasdan 20 soniya savollarga javob ber."},
+ {c:"🎭 HARD",e:"Biror mashhur qahramonni faqat harakat bilan 15 soniyada tushuntir."},
+ {c:"⚡ HARD",e:"15 soniyada 10 marta sakra va keyin alifboni teskari aytishga urin."},
+ {c:"😂 HARD",e:"Ikkinchi o‘yinchini kuldir, lekin o‘zing kulishing mumkin emas."},
+ {c:"🧩 HARD",e:"3 ta hayvon, 3 ta davlat va 3 ta taomni 15 soniyada sanab ber."}
+];
+
+let state={p1:"Player 1",p2:"Player 2",scores:[0,0],turn:0,round:1,total:10,time:30,left:30,diff:"easy",used:[],history:[]};
+let timer=null,sound=true;
+
+const $=id=>document.getElementById(id);
+const screens={home:$("home"),game:$("game"),result:$("result")};
+
+function show(name){Object.values(screens).forEach(x=>x.classList.remove("active"));screens[name].classList.add("active");scrollTo(0,0)}
+function toast(t){$("toast").textContent=t;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),1700)}
+function beep(freq=520,duration=.07){if(!sound)return;try{let a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.frequency.value=freq;g.gain.value=.035;o.connect(g);g.connect(a.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,a.currentTime+duration);o.stop(a.currentTime+duration)}catch(e){}}
+function challengePool(){return state.diff==="hard"?challenges.concat(hard):challenges}
+function nextChallenge(){
+  clearInterval(timer);
+  const pool=challengePool();
+  if(state.used.length>=pool.length)state.used=[];
+  let idx;do{idx=Math.floor(Math.random()*pool.length)}while(state.used.includes(idx)&&state.used.length<pool.length);
+  state.used.push(idx);
+  const x=pool[idx];
+  $("task").textContent=x.e;$("category").textContent=x.c;
+  $("turn").textContent=(state.turn===0?state.p1:state.p2).toUpperCase()+" NAVBATI";
+  $("round").textContent=`ROUND ${state.round}/${state.total}`;
+  $("n1").textContent=state.p1;$("n2").textContent=state.p2;
+  $("s1").textContent=state.scores[0];$("s2").textContent=state.scores[1];
+  state.left=state.time;updateTimer();
+  timer=setInterval(()=>{state.left--;updateTimer();if(state.left<=0){clearInterval(timer);beep(180,.2);toast("⏰ Vaqt tugadi!");setTimeout(()=>finishRound(false),500)}},1000);
+}
+function updateTimer(){
+  $("timer").textContent=state.left;
+  $("timer").classList.toggle("warning",state.left<=10&&state.left>5);
+  $("timer").classList.toggle("danger",state.left<=5);
+  $("bar").style.width=(state.left/state.time*100)+"%";
+}
+function finishRound(success){
+  clearInterval(timer);
+  const who=state.turn;
+  if(success){
+    const pts=Math.max(1,Math.ceil(state.left/state.time*3));
+    state.scores[who]+=pts;
+    state.history.push({p:who,ok:true,pts,task:$("task").textContent});
+    beep(760,.1);toast(`+${pts} ball! 🔥`);
+  }else{
+    state.history.push({p:who,ok:false,pts:0,task:$("task").textContent});
+  }
+  $("s1").textContent=state.scores[0];$("s2").textContent=state.scores[1];
+  if(state.round>=state.total){setTimeout(endGame,450);return}
+  state.round++;state.turn=state.turn===0?1:0;
+  setTimeout(nextChallenge,650);
+}
+function endGame(){
+  clearInterval(timer);
+  $("rn1").textContent=state.p1;$("rn2").textContent=state.p2;
+  $("rs1").textContent=state.scores[0];$("rs2").textContent=state.scores[1];
+  const sub=state.scores[0]===state.scores[1]?"Durrang! Ikkovingiz ham bir xil ball oldingiz.":state.scores[0]>state.scores[1]?`${state.p1} ${state.scores[0]} ball bilan ko‘proq ball oldi.`:`${state.p2} ${state.scores[1]} ball bilan ko‘proq ball oldi.`;
+  $("resultTitle").textContent="O‘yin tugadi! 🎉";$("resultSub").textContent=sub;
+  $("history").innerHTML=state.history.map((h,i)=>`<div class="item"><span>R${i+1} · ${h.p===0?escapeHtml(state.p1):escapeHtml(state.p2)}</span><b>${h.ok?"+"+h.pts:"0"}</b></div>`).join("");
+  show("result");
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+document.querySelectorAll("[data-diff]").forEach(b=>b.onclick=()=>{
+ document.querySelectorAll("[data-diff]").forEach(x=>x.classList.remove("selected"));b.classList.add("selected");state.diff=b.dataset.diff;
+});
+$("soundBtn").onclick=()=>{sound=!sound;$("soundBtn").textContent=sound?"🔊":"🔇";toast(sound?"Ovoz yoqildi":"Ovoz o‘chirildi")};
+$("start").onclick=()=>{
+ state.p1=$("p1").value.trim()||"Player 1";state.p2=$("p2").value.trim()||"Player 2";
+ state.scores=[0,0];state.turn=0;state.round=1;state.time=Number($("time").value);state.used=[];state.history=[];
+ show("game");nextChallenge();
+};
+$("done").onclick=()=>finishRound(true);
+$("skip").onclick=()=>finishRound(false);
+$("again").onclick=()=>{$("start").click()};
+$("homeBtn").onclick=()=>show("home");
+const infoModal=$("infoModal");
+const openInfo=()=>{infoModal.classList.remove("hidden");infoModal.style.display="flex"};
+const closeInfo=()=>{infoModal.classList.add("hidden");infoModal.style.display="none"};
+$("how").onclick=openInfo;
+$("closeInfo").onclick=closeInfo;
+$("closeInfo2").onclick=closeInfo;
+infoModal.addEventListener("click",e=>{if(e.target===infoModal)closeInfo()});
+$("p1").addEventListener("input",()=>{if($("p1").value.length>16)$("p1").value=$("p1").value.slice(0,16)});
+$("p2").addEventListener("input",()=>{if($("p2").value.length>16)$("p2").value=$("p2").value.slice(0,16)});
+})();
+</script>
+</body>
+</html>
